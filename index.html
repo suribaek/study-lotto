@@ -2,126 +2,166 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>스터디 추첨기 🎰</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>스터디 랜덤 추첨기 🎰</title>
   <style>
     body {
-      background: #fefefe;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 40px 20px;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
+
     h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
+      font-size: 28px;
+      margin-bottom: 25px;
+      color: #333;
     }
-    .slot-box {
+
+    .slot-container {
       width: 300px;
-      height: 50px;
+      height: 50px; /* 슬롯창 높이 = 아이템 높이 */
       overflow: hidden;
       border: 3px solid #4CAF50;
-      margin: 0 auto 20px;
-      border-radius: 10px;
-      background: white;
+      border-radius: 12px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+      margin-bottom: 30px;
       position: relative;
     }
-    .slot-items {
-      display: block;
-      transition: transform 2s ease-out;
+
+    .slot-list {
+      display: flex;
+      flex-direction: column;
     }
+
     .slot-item {
-      height: 50px;
-      line-height: 50px;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
-      border-bottom: 1px solid #eee;
+      height: 50px; /* 슬롯창 높이와 동일 */
+      line-height: 50px; /* 세로 가운데 정렬 */
+      color: #222;
+      text-align: center;
     }
+
     button {
-      padding: 12px 24px;
-      font-size: 18px;
-      background: #4CAF50;
+      padding: 15px 35px;
+      background-color: #4CAF50;
       color: white;
+      font-size: 18px;
+      font-weight: bold;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    #result {
-      font-size: 20px;
-      margin-top: 20px;
+
+    button:disabled {
+      background-color: #9e9e9e;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
+      background-color: #45a049;
+    }
+
+    #winner {
+      margin-top: 25px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #222;
     }
   </style>
 </head>
 <body>
-  <h1>📦 스터디 회비 추첨기 📦</h1>
-  <div class="slot-box">
-    <div id="slotList" class="slot-items"></div>
+  <h1>🎉 스터디 회비 당첨자 추첨 🎉</h1>
+
+  <div class="slot-container">
+    <div id="slotList" class="slot-list"></div>
   </div>
-  <button id="startBtn">추첨 시작</button>
-  <div id="result"></div>
+
+  <button id="drawBtn">추첨 시작!</button>
+  <div id="winner"></div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const members = [
-        "김철수","박영희","이민호","정수진","최민수","오수현","한지원","유지혜",
-        "김수연","이서연","박준형","장다은","홍길동","박서준","최예린","강지훈",
-        "김유리","조성민","윤하늘","임채원","백수현","노은지","서지우","김지현",
-        "신동혁","박하린","양민석","정하늘","김다인","황지민","송예은","권민수",
-        "장우혁","이수빈","박재민","윤지혜","김태현","전소윤","조민재","허지수"
-      ];
+    const members = [
+      "김철수","박영희","이민호","정수진","최민수","오수현","한지원","유지혜",
+      "김수연","이서연","박준형","장다은","홍길동","박서준","최예린","강지훈",
+      "김유리","조성민","윤하늘","임채원","백수현","노은지","서지우","김지현",
+      "신동혁","박하린","양민석","정하늘","김다인","황지민","송예은","권민수",
+      "장우혁","이수빈","박재민","윤지혜","김태현","전소윤","조민재","허지수"
+    ];
 
-      const slotList = document.getElementById("slotList");
-      const startBtn = document.getElementById("startBtn");
-      const result = document.getElementById("result");
+    const slotList = document.getElementById("slotList");
+    const drawBtn = document.getElementById("drawBtn");
+    const winnerDiv = document.getElementById("winner");
+    const itemHeight = 50; // 슬롯 아이템 높이
 
-      const itemHeight = 50;
-
-      function renderSlot(repeat = 20) {
-        slotList.innerHTML = "";
-        const list = [];
-
-        // 20번 반복하여 무작위 이름 채우기
-        for (let i = 0; i < repeat; i++) {
-          const name = members[Math.floor(Math.random() * members.length)];
-          const div = document.createElement("div");
-          div.className = "slot-item";
-          div.textContent = name;
-          list.push(div);
-        }
-
-        // 마지막엔 당첨자 이름을 추가
-        const winner = members[Math.floor(Math.random() * members.length)];
-        const winnerDiv = document.createElement("div");
-        winnerDiv.className = "slot-item";
-        winnerDiv.textContent = winner;
-        list.push(winnerDiv);
-
-        list.forEach((el) => slotList.appendChild(el));
-
-        // 애니메이션: 끝까지 내려간 다음 당첨자 표시
-        const totalItems = list.length;
-        const finalOffset = -itemHeight * (totalItems - 1);
-        slotList.style.transform = `translateY(${finalOffset}px)`;
-
-        // 결과 텍스트
-        setTimeout(() => {
-          result.innerHTML = `🎯 <b>${winner}</b> 님이 당첨되셨습니다! 🎉`;
-          startBtn.disabled = false;
-        }, 2000);
-      }
-
-      startBtn.addEventListener("click", () => {
-        slotList.style.transition = "none";
-        slotList.style.transform = "translateY(0px)";
-        result.innerHTML = "";
-        startBtn.disabled = true;
-
-        // 잠깐 기다렸다가 애니메이션 적용
-        setTimeout(() => {
-          slotList.style.transition = "transform 2s ease-out";
-          renderSlot();
-        }, 100);
+    // 슬롯 아이템 생성
+    function renderSlotItems(repeatCount = 40) {
+      slotList.innerHTML = "";
+      const repeatedList = [];
+      for (let i = 0; i < repeatCount; i++) repeatedList.push(...members);
+      repeatedList.forEach(name => {
+        const div = document.createElement("div");
+        div.classList.add("slot-item");
+        div.textContent = name;
+        slotList.appendChild(div);
       });
-    });
+    }
+
+    function pickWinner() {
+      drawBtn.disabled = true;
+      winnerDiv.textContent = "";
+
+      // 당첨자 랜덤 선정
+      const winner = members[Math.floor(Math.random() * members.length)];
+
+      // 충분히 많은 이름 리스트 생성
+      renderSlotItems(50);
+
+      // 멈출 위치 계산
+      const rounds = 15; // 더 오래 돌림
+      const winnerIndex = members.indexOf(winner);
+      const finalIndex = (members.length * rounds) + winnerIndex;
+      const translateY = -(finalIndex * itemHeight);
+
+      // 애니메이션 실행
+      slotList.style.transition = "transform 6s cubic-bezier(0.33, 1, 0.68, 1)";
+      slotList.style.transform = `translateY(${translateY}px)`;
+
+      // transitionend 이벤트로 애니메이션 끝나자마자 처리
+      slotList.addEventListener("transitionend", function handleEnd() {
+        // 당첨자 표시
+        winnerDiv.innerHTML = `🎊 이번 달 당첨자: <span style="color:#4CAF50">${winner}</span> 🎊`;
+
+        // 슬롯 내부를 당첨자 1명만 표시
+        slotList.style.transition = "none";
+        slotList.innerHTML = "";
+        const div = document.createElement("div");
+        div.classList.add("slot-item");
+        div.textContent = winner;
+        slotList.appendChild(div);
+
+        // transform 초기화 → 당첨자만 중앙에 표시
+        slotList.style.transform = "translateY(0)";
+
+        // 이벤트 중복 방지
+        slotList.removeEventListener("transitionend", handleEnd);
+        drawBtn.disabled = false;
+      });
+    }
+
+    drawBtn.addEventListener("click", pickWinner);
+
+    // 초기 리스트 생성
+    renderSlotItems(30);
   </script>
 </body>
 </html>
