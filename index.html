@@ -10,9 +10,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      justify-content: flex-start;
+      min-height: 100vh;
       margin: 0;
+      padding-top: 40px;
     }
 
     h1 {
@@ -23,7 +24,7 @@
 
     .slot-container {
       width: 300px;
-      height: 50px; /* 슬롯창 높이 = 아이템 높이 */
+      height: 50px;
       overflow: hidden;
       border: 3px solid #4CAF50;
       border-radius: 12px;
@@ -33,7 +34,6 @@
       justify-content: center;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
       margin-bottom: 30px;
-      position: relative;
     }
 
     .slot-list {
@@ -44,8 +44,8 @@
     .slot-item {
       font-size: 22px;
       font-weight: bold;
-      height: 50px; /* 슬롯창 높이와 동일 */
-      line-height: 50px; /* 세로 가운데 정렬 */
+      height: 50px;
+      line-height: 50px;
       color: #222;
       text-align: center;
     }
@@ -77,6 +77,38 @@
       font-weight: bold;
       color: #222;
     }
+
+    .members-list {
+      margin-top: 35px;
+      padding: 15px 20px;
+      width: 300px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      font-size: 14px;
+      line-height: 1.6;
+      color: #444;
+    }
+
+    .members-list h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #4CAF50;
+      text-align: center;
+    }
+
+    .members-names {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px 10px;
+    }
+
+    .members-names span {
+      background: #e9f5ec;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -89,6 +121,11 @@
   <button id="drawBtn">추첨 시작!</button>
   <div id="winner"></div>
 
+  <div class="members-list">
+    <h2>📋 추첨 대상자</h2>
+    <div class="members-names" id="membersDisplay"></div>
+  </div>
+
   <script>
     const members = [
       "강소윤","권민영","김강민","김도욱","김리안","김수빈","김준형","김홍기","김희연","문상희",
@@ -100,9 +137,9 @@
     const slotList = document.getElementById("slotList");
     const drawBtn = document.getElementById("drawBtn");
     const winnerDiv = document.getElementById("winner");
-    const itemHeight = 50; // 슬롯 아이템 높이
+    const membersDisplay = document.getElementById("membersDisplay");
+    const itemHeight = 50;
 
-    // 슬롯 아이템 생성
     function renderSlotItems(repeatCount = 40) {
       slotList.innerHTML = "";
       const repeatedList = [];
@@ -119,39 +156,29 @@
       drawBtn.disabled = true;
       winnerDiv.textContent = "";
 
-      // 당첨자 랜덤 선정
       const winner = members[Math.floor(Math.random() * members.length)];
 
-      // 충분히 많은 이름 리스트 생성
       renderSlotItems(50);
 
-      // 멈출 위치 계산
-      const rounds = 15; // 더 오래 돌림
+      const rounds = 15;
       const winnerIndex = members.indexOf(winner);
       const finalIndex = (members.length * rounds) + winnerIndex;
       const translateY = -(finalIndex * itemHeight);
 
-      // 애니메이션 실행
       slotList.style.transition = "transform 6s cubic-bezier(0.33, 1, 0.68, 1)";
       slotList.style.transform = `translateY(${translateY}px)`;
 
-      // transitionend 이벤트로 애니메이션 끝나자마자 처리
       slotList.addEventListener("transitionend", function handleEnd() {
-        // 당첨자 표시
         winnerDiv.innerHTML = `🎊 이번 달 당첨자: <span style="color:#4CAF50">${winner}</span> 🎊`;
 
-        // 슬롯 내부를 당첨자 1명만 표시
         slotList.style.transition = "none";
         slotList.innerHTML = "";
         const div = document.createElement("div");
         div.classList.add("slot-item");
         div.textContent = winner;
         slotList.appendChild(div);
-
-        // transform 초기화 → 당첨자만 중앙에 표시
         slotList.style.transform = "translateY(0)";
 
-        // 이벤트 중복 방지
         slotList.removeEventListener("transitionend", handleEnd);
         drawBtn.disabled = false;
       });
@@ -159,8 +186,14 @@
 
     drawBtn.addEventListener("click", pickWinner);
 
-    // 초기 리스트 생성
     renderSlotItems(30);
+
+    // 대상자 리스트 출력 (span으로 감싸서 스타일 적용)
+    members.forEach(name => {
+      const span = document.createElement("span");
+      span.textContent = name;
+      membersDisplay.appendChild(span);
+    });
   </script>
 </body>
 </html>
