@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>스터디 추첨기 🎰</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: #fefefe;
+      font-family: 'sans-serif';
+      text-align: center;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .slot-box {
+      width: 300px;
+      height: 50px;
+      overflow: hidden;
+      border: 3px solid #4CAF50;
+      margin: 0 auto 20px;
+      border-radius: 10px;
+      background: white;
+      position: relative;
+    }
+    .slot-items {
+      display: block;
+      transition: transform 4s ease-in-out;
+    }
+    .slot-item {
+      height: 50px;
+      line-height: 50px;
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 1px solid #eee;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+    #result {
+      font-size: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📦 스터디 회비 추첨기 📦</h1>
+  <div class="slot-box">
+    <div id="slotList" class="slot-items"></div>
+  </div>
+  <button id="startBtn">추첨 시작</button>
+  <div id="result"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const members = [
+        "김철수","박영희","이민호","정수진","최민수","오수현","한지원","유지혜",
+        "김수연","이서연","박준형","장다은","홍길동","박서준","최예린","강지훈",
+        "김유리","조성민","윤하늘","임채원","백수현","노은지","서지우","김지현",
+        "신동혁","박하린","양민석","정하늘","김다인","황지민","송예은","권민수",
+        "장우혁","이수빈","박재민","윤지혜","김태현","전소윤","조민재","허지수"
+      ];
+
+      const slotList = document.getElementById("slotList");
+      const startBtn = document.getElementById("startBtn");
+      const result = document.getElementById("result");
+
+      const itemHeight = 50;
+      let isSpinning = false;
+
+      function renderItems(repeat = 30) {
+        slotList.innerHTML = '';
+        const all = [];
+        for (let i = 0; i < repeat; i++) {
+          all.push(...members);
+        }
+        all
