@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>스터디 추첨기 🎰</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       background: #fefefe;
-      font-family: 'sans-serif';
+      font-family: sans-serif;
       text-align: center;
       padding: 40px 20px;
     }
@@ -27,7 +27,7 @@
     }
     .slot-items {
       display: block;
-      transition: transform 4s ease-in-out;
+      transition: transform 2s ease-out;
     }
     .slot-item {
       height: 50px;
@@ -43,6 +43,7 @@
       color: white;
       border: none;
       border-radius: 6px;
+      cursor: pointer;
     }
     #result {
       font-size: 20px;
@@ -73,12 +74,54 @@
       const result = document.getElementById("result");
 
       const itemHeight = 50;
-      let isSpinning = false;
 
-      function renderItems(repeat = 30) {
-        slotList.innerHTML = '';
-        const all = [];
+      function renderSlot(repeat = 20) {
+        slotList.innerHTML = "";
+        const list = [];
+
+        // 20번 반복하여 무작위 이름 채우기
         for (let i = 0; i < repeat; i++) {
-          all.push(...members);
+          const name = members[Math.floor(Math.random() * members.length)];
+          const div = document.createElement("div");
+          div.className = "slot-item";
+          div.textContent = name;
+          list.push(div);
         }
-        all
+
+        // 마지막엔 당첨자 이름을 추가
+        const winner = members[Math.floor(Math.random() * members.length)];
+        const winnerDiv = document.createElement("div");
+        winnerDiv.className = "slot-item";
+        winnerDiv.textContent = winner;
+        list.push(winnerDiv);
+
+        list.forEach((el) => slotList.appendChild(el));
+
+        // 애니메이션: 끝까지 내려간 다음 당첨자 표시
+        const totalItems = list.length;
+        const finalOffset = -itemHeight * (totalItems - 1);
+        slotList.style.transform = `translateY(${finalOffset}px)`;
+
+        // 결과 텍스트
+        setTimeout(() => {
+          result.innerHTML = `🎯 <b>${winner}</b> 님이 당첨되셨습니다! 🎉`;
+          startBtn.disabled = false;
+        }, 2000);
+      }
+
+      startBtn.addEventListener("click", () => {
+        slotList.style.transition = "none";
+        slotList.style.transform = "translateY(0px)";
+        result.innerHTML = "";
+        startBtn.disabled = true;
+
+        // 잠깐 기다렸다가 애니메이션 적용
+        setTimeout(() => {
+          slotList.style.transition = "transform 2s ease-out";
+          renderSlot();
+        }, 100);
+      });
+    });
+  </script>
+</body>
+</html>
