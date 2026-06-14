@@ -2,199 +2,560 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>스터디 랜덤 추첨기 🎰</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>成人依恋类型问卷 | 성인 애착유형 설문</title>
   <style>
+    :root {
+      --bg: #f7f3ee;
+      --card: #fffaf5;
+      --text: #2f2924;
+      --muted: #756b63;
+      --accent: #b96b5a;
+      --accent-dark: #8e4d40;
+      --line: #eaded4;
+      --error: #c0392b;
+      --ok: #3f7d58;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: #f8fafc;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
       margin: 0;
-      padding-top: 40px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Noto Sans SC", sans-serif;
+      background: linear-gradient(180deg, #f7f3ee 0%, #fffaf5 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      width: min(960px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 64px;
+    }
+
+    header {
+      padding: 28px 24px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 250, 245, 0.86);
+      box-shadow: 0 16px 40px rgba(77, 51, 38, 0.08);
+      margin-bottom: 24px;
     }
 
     h1 {
-      font-size: 28px;
-      margin-bottom: 25px;
-      color: #333;
+      margin: 0 0 8px;
+      font-size: clamp(26px, 5vw, 42px);
+      letter-spacing: -0.04em;
     }
 
-    .slot-container {
-      width: 300px;
-      height: 50px;
-      overflow: hidden;
-      border: 3px solid #4CAF50;
-      border-radius: 12px;
-      background: #fff;
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .notice {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: #fff3ec;
+      border: 1px solid #f0d0c1;
+      border-radius: 16px;
+      color: #644439;
+      font-size: 14px;
+    }
+
+    .progress-box {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 12px 0;
+      background: linear-gradient(180deg, rgba(247, 243, 238, 0.98), rgba(247, 243, 238, 0.82));
+      backdrop-filter: blur(10px);
+    }
+
+    .progress-inner {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 999px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-      margin-bottom: 30px;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(77, 51, 38, 0.06);
     }
 
-    .slot-list {
+    .progress-text {
+      min-width: 86px;
+      font-weight: 700;
+      color: var(--accent-dark);
+      font-size: 14px;
+    }
+
+    .bar {
+      height: 10px;
+      flex: 1;
+      background: #f1e5dd;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: inherit;
+      transition: width 0.2s ease;
+    }
+
+    form {
+      display: grid;
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .question {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--card);
+      box-shadow: 0 10px 28px rgba(77, 51, 38, 0.055);
+    }
+
+    .question.missing {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+    }
+
+    .q-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .q-cn {
+      margin: 0 0 6px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .q-ko {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    label.choice {
       display: flex;
       flex-direction: column;
+      gap: 4px;
+      min-height: 88px;
+      padding: 12px 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: white;
+      cursor: pointer;
+      transition: 0.16s ease;
+      text-align: center;
     }
 
-    .slot-item {
-      font-size: 22px;
-      font-weight: bold;
-      height: 50px;
-      line-height: 50px;
-      color: #222;
-      text-align: center;
+    label.choice:hover {
+      transform: translateY(-1px);
+      border-color: #d8b3a4;
+    }
+
+    label.choice:has(input:checked) {
+      border-color: var(--accent);
+      background: #fff1ea;
+      box-shadow: 0 0 0 3px rgba(185, 107, 90, 0.14);
+    }
+
+    input[type="radio"] {
+      accent-color: var(--accent);
+      margin: 0 auto 4px;
+    }
+
+    .choice-num {
+      font-weight: 800;
+      color: var(--accent-dark);
+    }
+
+    .choice-cn { font-size: 14px; }
+    .choice-ko { font-size: 12px; color: var(--muted); }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
     }
 
     button {
-      padding: 15px 35px;
-      background-color: #4CAF50;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:disabled {
-      background-color: #9e9e9e;
-      cursor: not-allowed;
-    }
-
-    button:hover:enabled {
-      background-color: #45a049;
-    }
-
-    #winner {
-      margin-top: 25px;
-      font-size: 24px;
-      font-weight: bold;
-      color: #222;
-    }
-
-    .members-list {
-      margin-top: 35px;
-      padding: 15px 20px;
-      width: 300px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      font-size: 14px;
-      line-height: 1.6;
-      color: #444;
-    }
-
-    .members-list h2 {
-      margin: 0 0 10px;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 20px;
       font-size: 16px;
-      color: #4CAF50;
-      text-align: center;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.16s ease;
     }
 
-    .members-names {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px 10px;
+    .submit {
+      background: var(--accent);
+      color: white;
+      flex: 1;
+      min-width: 180px;
     }
 
-    .members-names span {
-      background: #e9f5ec;
-      padding: 4px 8px;
-      border-radius: 6px;
+    .submit:hover { background: var(--accent-dark); }
+
+    .reset {
+      background: #efe4dc;
+      color: #5a4439;
+    }
+
+    .result {
+      display: none;
+      margin-top: 24px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: white;
+      box-shadow: 0 16px 40px rgba(77, 51, 38, 0.08);
+    }
+
+    .result.show { display: block; }
+
+    .result h2 {
+      margin-top: 0;
+      font-size: 26px;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .score-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: #fffaf5;
+    }
+
+    .score-card strong {
+      display: block;
+      font-size: 22px;
+      color: var(--accent-dark);
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .summary-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fffaf5;
+    }
+
+    .summary-item b {
+      color: var(--accent-dark);
+    }
+
+    .copy-box {
+      width: 100%;
+      min-height: 180px;
+      margin-top: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      resize: vertical;
+      background: #fffdfb;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+      background: #efe4dc;
+      color: #5a4439;
+    }
+
+    .error-message {
+      display: none;
+      margin: 14px 0 0;
+      color: var(--error);
+      font-weight: 700;
+    }
+
+    .error-message.show { display: block; }
+
+    @media (max-width: 720px) {
+      .choices { grid-template-columns: 1fr; }
+      label.choice {
+        min-height: auto;
+        text-align: left;
+        flex-direction: row;
+        align-items: center;
+      }
+      input[type="radio"] { margin: 0 4px 0 0; }
+      .choice-num { width: 22px; }
+      .choice-ko { margin-left: auto; text-align: right; }
     }
   </style>
 </head>
 <body>
-  <h1>🎉 스터디 회비 당첨자 추첨 🎉</h1>
+  <main class="wrap">
+    <header>
+      <h1>成人依恋类型问卷<br />성인 애착유형 설문</h1>
+      <p class="subtitle">36개의 문항을 읽고 가장 가까운 답을 선택하세요.</p>
+      <div class="notice">
+        이 페이지는 자기이해를 돕기 위한 설문용 페이지입니다. 의학적·심리학적 진단을 대체하지 않습니다.
+      </div>
+    </header>
 
-  <div class="slot-container">
-    <div id="slotList" class="slot-list"></div>
-  </div>
+    <div class="progress-box">
+      <div class="progress-inner">
+        <div class="progress-text"><span id="answeredCount">0</span>/36 완료</div>
+        <div class="bar"><span id="progressBar"></span></div>
+      </div>
+    </div>
 
-  <button id="drawBtn">추첨 시작!</button>
-  <div id="winner"></div>
+    <form id="surveyForm"></form>
+    <p id="errorMessage" class="error-message">아직 선택하지 않은 문항이 있어요. 표시된 문항을 확인해주세요.</p>
 
-  <div class="members-list">
-    <h2>📋 추첨 대상자</h2>
-    <div class="members-names" id="membersDisplay"></div>
-  </div>
+    <div class="actions">
+      <button class="submit" type="button" id="submitBtn">결과 보기 / 查看结果</button>
+      <button class="reset" type="button" id="resetBtn">초기화 / 重置</button>
+    </div>
+
+    <section id="result" class="result" aria-live="polite">
+      <h2>선택 결과 / 选择结果</h2>
+      <div class="score-grid">
+        <div class="score-card">총점 / 总分 <strong id="totalScore">0</strong></div>
+        <div class="score-card">평균 / 平均 <strong id="avgScore">0</strong></div>
+        <div class="score-card">회피 관련 평균 / 回避相关平均 <strong id="avoidAvg">0</strong></div>
+        <div class="score-card">불안 관련 평균 / 焦虑相关平均 <strong id="anxietyAvg">0</strong></div>
+      </div>
+      <p class="subtitle">아래에는 각 문항에서 선택한 번호와 선택지를 중국어/한국어로 함께 표시합니다.</p>
+      <button class="copy-btn" type="button" id="copyBtn">결과 복사 / 复制结果</button>
+      <textarea id="copyText" class="copy-box" readonly></textarea>
+      <div id="summaryList" class="summary-list"></div>
+    </section>
+  </main>
 
   <script>
-    const members = [
-      "탁동현","심유경","정도희","최재완","백수현","강소윤","권민영","김강민","김도욱","김리안",
-      "김소연","김수빈","김준형","김혜원","김희연","문상희","배종성","서정민","손보경","송재희",
-      "신원진","심희진","안건주","우인희","이서현","이슬기","임민혁","전예원","정동진","정이진",
-      "조재영","조준영","최다솔","최민정","최예은"
+    const questions = [
+      { cn: "我不想让对方看出我对他有多大的好感", ko: "내가 얼마나 호감을 가지고 있는지 상대방에게 보이고 싶지 않다" },
+      { cn: "我经常担心自己会被抛弃", ko: "나는 버림을 받는 것에 대해 걱정하는 편이다" },
+      { cn: "我觉得和别人变得亲近是一件很舒服的事", ko: "나는 다른 사람과 가까워지는 것이 매우 편안하다" },
+      { cn: "我经常为自己与他人的关系感到担心", ko: "나는 다른 사람과의 관계에 대해 많이 걱정하는 편이다" },
+      { cn: "当别人刚想和我变得亲近时，我会发现自己有些抗拒", ko: "상대방이 막 나와 친해지려고 할 때 꺼려하는 나를 발견한다" },
+      { cn: "我担心自己对别人有多在意，而他们却没有同样在意我", ko: "내가 다른 사람에게 관심을 가지는 만큼 그들이 나에게 관심을 가지지 않을까봐 걱정이다" },
+      { cn: "当别人想和我变得非常亲近时，我会感到不舒服", ko: "나는 다른 사람이 나와 매우 가까워지려 할 때 불편하다" },
+      { cn: "我很担心会失去与我亲近的人", ko: "나는 나와 친한 사람을 잃을까봐 꽤 걱정이 된다" },
+      { cn: "我不太容易向别人敞开心扉", ko: "나는 다른 사람에게 마음을 여는 것이 편안하지 못하다" },
+      { cn: "我经常希望别人也能像我对他们那样对我好", ko: "나는 종종 내가 상대방에게 호의를 보이는 만큼 상대방도 그렇게 해 주기를 바란다" },
+      { cn: "我想和别人变得亲近，但又会改变想法而放弃", ko: "나는 상대방과 가까워지기를 원하지만 나는 생각을 바꾸어 그만둔다" },
+      { cn: "因为我想和对方融为一体，所以有时候人们会远离我", ko: "나는 상대방과 하나가 되길 원하기 때문에 사람들이 때때로 나에게서 멀어진다" },
+      { cn: "当别人和我变得太亲近时，我会变得敏感", ko: "나는 다른 사람이 나와 너무 가까워졌을 때 예민해진다" },
+      { cn: "我担心自己会被独自留下", ko: "나는 혼자 남겨질까봐 걱정이다" },
+      { cn: "我觉得向别人说出自己的想法和感受是舒服的", ko: "나는 다른 사람에게 내 생각과 감정을 이야기하는 것이 편안하다" },
+      { cn: "因为我过于渴望亲密关系，有时别人会害怕而与我保持距离", ko: "지나치게 친밀해지고자 하는 욕심 때문에 때로 사람들이 두려워하여 거리를 둔다" },
+      { cn: "我会尽量避免和别人变得太亲近", ko: "나는 상대방과 너무 가까워지는 것을 피하려고 한다" },
+      { cn: "我经常希望确认自己是被对方爱着的", ko: "나는 상대방으로부터 사랑받고 있다는 것을 자주 확인받고 싶어한다" },
+      { cn: "我觉得和别人变得亲近比较容易", ko: "나는 다른 사람과 가까워지는 것이 비교적 쉽다" },
+      { cn: "有时候我会要求别人给予我更多的爱和更多的投入", ko: "가끔 나는 다른 사람에게, 더 많은 애정과 더 많은 헌신을 보여줄 것을 강요한다" },
+      { cn: "我很难依赖别人", ko: "나는 다른 사람에게 의지하기가 어렵다" },
+      { cn: "我有时不会担心被抛弃", ko: "나는 버림받는 것에 대해 때때로 걱정하지 않는다" },
+      { cn: "我不喜欢和别人变得太亲近", ko: "나는 다른 사람과 너무 가까워지는 것을 좋아하지 않는다" },
+      { cn: "如果对方没有对我表现出关心，我会生气", ko: "만약 상대방이 나에게 관심을 보이지 않는다면 나는 화가난다" },
+      { cn: "我会把所有事情都告诉对方", ko: "나는 상대방에게 모든 것을 이야기한다" },
+      { cn: "我知道对方并不想和我变得像我希望的那样亲近", ko: "상대방이 내가 원하는 만큼 가까워지는 것을 원치 않음을 안다" },
+      { cn: "我通常会向别人倾诉自己的问题和烦恼", ko: "나는 대개 다른 사람에게 내 문제와 고민을 상담한다" },
+      { cn: "当我和别人没有联系时，我会有些担心和不安", ko: "내가 다른 사람과 교류가 없을 때 나는 다소 걱정스럽고 불안하다" },
+      { cn: "依赖别人让我感到舒服", ko: "다른 사람에게 의지하는 것이 편안하다" },
+      { cn: "当对方没有像我希望的那样陪在我身边时，我会感到失望", ko: "상대방이 내가 원하는 만큼 가까이에 있지 않을 때 실망하게 된다" },
+      { cn: "我无法向别人寻求安慰、建议或帮助", ko: "나는 상대방에게 위로, 조언, 또는 도움을 청하지 못한다" },
+      { cn: "当我需要对方而被拒绝时，我会感到失望", ko: "내가 필요로 할 때 상대방이 거절한다면 실망하게 된다" },
+      { cn: "当我需要的时候，依赖对方对我是有帮助的", ko: "내가 필요로 할 때 상대방에게 의지하는 게 도움이 된다" },
+      { cn: "当对方对我表示不满时，我会觉得自己非常糟糕", ko: "상대방이 나에게 불만을 나타낼 때 나 자신이 정말 형편없게 느껴진다" },
+      { cn: "我在很多事情上依赖对方，包括安慰和肯定", ko: "나는 위로와 확신을 비롯한 많은 일들을 상대방에게 의지한다" },
+      { cn: "当对方离开我并花很多时间在别处时，我会感到不愉快", ko: "상대방이 나를 떠나서 많은 시간을 보내면 나는 불쾌하다" }
     ];
 
-    const slotList = document.getElementById("slotList");
-    const drawBtn = document.getElementById("drawBtn");
-    const winnerDiv = document.getElementById("winner");
-    const membersDisplay = document.getElementById("membersDisplay");
-    const itemHeight = 50;
+    const choices = [
+      { value: 1, cn: "完全不符合", ko: "전혀 그렇지 않다" },
+      { value: 2, cn: "不符合", ko: "그렇지 않다" },
+      { value: 3, cn: "一般", ko: "보통 정도이다" },
+      { value: 4, cn: "比较符合", ko: "대체로 그렇다" },
+      { value: 5, cn: "非常符合", ko: "매우 그렇다" }
+    ];
 
-    function renderSlotItems(repeatCount = 40) {
-      slotList.innerHTML = "";
-      const repeatedList = [];
-      for (let i = 0; i < repeatCount; i++) repeatedList.push(...members);
-      repeatedList.forEach(name => {
-        const div = document.createElement("div");
-        div.classList.add("slot-item");
-        div.textContent = name;
-        slotList.appendChild(div);
+    // ECR-R 계열 문항 구분에 맞춘 참고용 평균입니다.
+    const avoidItems = [1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35];
+    const anxietyItems = [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36];
+    const reverseItems = [3,15,19,22,25,27,29,33,35];
+
+    const form = document.getElementById("surveyForm");
+    const answeredCount = document.getElementById("answeredCount");
+    const progressBar = document.getElementById("progressBar");
+    const errorMessage = document.getElementById("errorMessage");
+    const result = document.getElementById("result");
+    const summaryList = document.getElementById("summaryList");
+    const copyText = document.getElementById("copyText");
+
+    function renderQuestions() {
+      form.innerHTML = questions.map((q, index) => {
+        const num = index + 1;
+        const choiceHtml = choices.map(choice => `
+          <label class="choice">
+            <input type="radio" name="q${num}" value="${choice.value}" />
+            <span class="choice-num">${choice.value}</span>
+            <span class="choice-cn">${choice.cn}</span>
+            <span class="choice-ko">${choice.ko}</span>
+          </label>
+        `).join("");
+
+        return `
+          <section class="question" id="question-${num}">
+            <span class="q-number">${num}</span>
+            <p class="q-cn">${q.cn}</p>
+            <p class="q-ko">${q.ko}</p>
+            <div class="choices">${choiceHtml}</div>
+          </section>
+        `;
+      }).join("");
+    }
+
+    function getAnswers() {
+      return questions.map((_, index) => {
+        const checked = document.querySelector(`input[name="q${index + 1}"]:checked`);
+        return checked ? Number(checked.value) : null;
       });
     }
 
-    function pickWinner() {
-      drawBtn.disabled = true;
-      winnerDiv.textContent = "";
-
-      const winner = members[Math.floor(Math.random() * members.length)];
-
-      renderSlotItems(50);
-
-      const rounds = 15;
-      const winnerIndex = members.indexOf(winner);
-      const finalIndex = (members.length * rounds) + winnerIndex;
-      const translateY = -(finalIndex * itemHeight);
-
-      slotList.style.transition = "transform 6s cubic-bezier(0.33, 1, 0.68, 1)";
-      slotList.style.transform = `translateY(${translateY}px)`;
-
-      slotList.addEventListener("transitionend", function handleEnd() {
-        winnerDiv.innerHTML = `🎊 이번 달 당첨자: <span style="color:#4CAF50">${winner}</span> 🎊`;
-
-        slotList.style.transition = "none";
-        slotList.innerHTML = "";
-        const div = document.createElement("div");
-        div.classList.add("slot-item");
-        div.textContent = winner;
-        slotList.appendChild(div);
-        slotList.style.transform = "translateY(0)";
-
-        slotList.removeEventListener("transitionend", handleEnd);
-        drawBtn.disabled = false;
-      });
+    function updateProgress() {
+      const answers = getAnswers();
+      const count = answers.filter(Boolean).length;
+      answeredCount.textContent = count;
+      progressBar.style.width = `${(count / questions.length) * 100}%`;
     }
 
-    drawBtn.addEventListener("click", pickWinner);
+    function scoredValue(questionNumber, rawValue) {
+      return reverseItems.includes(questionNumber) ? 6 - rawValue : rawValue;
+    }
 
-    renderSlotItems(30);
+    function averageFor(items, answers) {
+      const sum = items.reduce((acc, itemNo) => acc + scoredValue(itemNo, answers[itemNo - 1]), 0);
+      return (sum / items.length).toFixed(2);
+    }
 
-    // 대상자 리스트 출력 (span으로 감싸서 스타일 적용)
-    members.forEach(name => {
-      const span = document.createElement("span");
-      span.textContent = name;
-      membersDisplay.appendChild(span);
-    });
+    function showResult() {
+      const answers = getAnswers();
+      let firstMissing = null;
+
+      questions.forEach((_, index) => {
+        const box = document.getElementById(`question-${index + 1}`);
+        if (!answers[index]) {
+          box.classList.add("missing");
+          if (!firstMissing) firstMissing = box;
+        } else {
+          box.classList.remove("missing");
+        }
+      });
+
+      if (firstMissing) {
+        errorMessage.classList.add("show");
+        result.classList.remove("show");
+        firstMissing.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      errorMessage.classList.remove("show");
+
+      const total = answers.reduce((acc, value) => acc + value, 0);
+      const avg = (total / answers.length).toFixed(2);
+      document.getElementById("totalScore").textContent = total;
+      document.getElementById("avgScore").textContent = avg;
+      document.getElementById("avoidAvg").textContent = averageFor(avoidItems, answers);
+      document.getElementById("anxietyAvg").textContent = averageFor(anxietyItems, answers);
+
+      const lines = answers.map((answer, index) => {
+        const q = questions[index];
+        const choice = choices.find(c => c.value === answer);
+        return `${index + 1}. ${answer}번 / ${choice.cn} / ${choice.ko}\n   CN: ${q.cn}\n   KR: ${q.ko}`;
+      });
+
+      copyText.value = [
+        "成人依恋类型问卷 / 성인 애착유형 설문 결과",
+        `총점 / 总分: ${total}`,
+        `평균 / 平均: ${avg}`,
+        `회피 관련 평균 / 回避相关平均: ${averageFor(avoidItems, answers)}`,
+        `불안 관련 평균 / 焦虑相关平均: ${averageFor(anxietyItems, answers)}`,
+        "",
+        ...lines
+      ].join("\n");
+
+      summaryList.innerHTML = answers.map((answer, index) => {
+        const choice = choices.find(c => c.value === answer);
+        return `
+          <div class="summary-item">
+            <b>${index + 1}번 / 第${index + 1}题</b><br />
+            선택 / 选择: <b>${answer}</b> · ${choice.cn} / ${choice.ko}<br />
+            <span>${questions[index].cn}</span><br />
+            <span>${questions[index].ko}</span>
+          </div>
+        `;
+      }).join("");
+
+      result.classList.add("show");
+      result.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function resetSurvey() {
+      form.reset();
+      document.querySelectorAll(".question").forEach(q => q.classList.remove("missing"));
+      errorMessage.classList.remove("show");
+      result.classList.remove("show");
+      copyText.value = "";
+      summaryList.innerHTML = "";
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function copyResult() {
+      copyText.select();
+      document.execCommand("copy");
+      const btn = document.getElementById("copyBtn");
+      const original = btn.textContent;
+      btn.textContent = "복사 완료 / 已复制";
+      setTimeout(() => btn.textContent = original, 1200);
+    }
+
+    renderQuestions();
+    form.addEventListener("change", updateProgress);
+    document.getElementById("submitBtn").addEventListener("click", showResult);
+    document.getElementById("resetBtn").addEventListener("click", resetSurvey);
+    document.getElementById("copyBtn").addEventListener("click", copyResult);
   </script>
 </body>
 </html>
-
